@@ -1,0 +1,12 @@
+torch>=2.0
+sentence-transformers>=2.2.2
+transformers>=4.41.0
+beir>=2.0.0
+pytrec_eval
+faiss-cpu
+InstructorEmbedding
+numpy
+pandas
+scikit-learn
+matplotlib
+tqdm

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Data caches
+data/embeddings/
+data/nfcorpus.zip
+data/nfcorpus/
+*.faiss
+
+# Logs / runs
+runs/
+output/
+wandb/
+lightning_logs/
+
+# Large training intermediates
+train_samples.pkl
+*.tmp
+
+# Model checkpoints (push manually / via LFS later)
+models/*.pt
+models/*.bin
+models/*.safetensors
