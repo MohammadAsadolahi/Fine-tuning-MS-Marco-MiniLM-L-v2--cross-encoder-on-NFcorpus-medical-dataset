@@ -32,6 +32,7 @@
   <a href="#-why-rerank">Why Rerank</a> •
   <a href="#-highlights">Highlights</a> •
   <a href="#-headline-results">Results</a> •
+  <a href="#%EF%B8%8F-honest-limitations">Limitations</a> •
   <a href="#%EF%B8%8F-pipeline">Pipeline</a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-recipe">Recipe</a> •
@@ -112,6 +113,24 @@ Trained exclusively on **publicly available NFCorpus** from BEIR — no private/
 > 💡 **How to read this table.** The bi-encoder alone is already strong on NFCorpus, because NFCorpus relevance is graded and Instructor-XL is a far larger model than MiniLM-L-4. Fine-tuning the cross-encoder pushes the **top of the list** up — the metrics that matter when you feed *k* documents into an LLM context (top-1, top-3). Recall and deep-list metrics are intentionally flat: the cross-encoder reranks, it does not retrieve.
 
 📈 Full discussion, learning curve, and training dynamics in **[`reports/fine_tune_report.md`](reports/fine_tune_report.md)**.
+
+---
+
+## ⚠️ Honest Limitations
+
+A few things this repo deliberately does **not** claim, so you can decide whether the recipe fits your stack:
+
+1. **The fine-tuned cross-encoder does not beat the Instructor-XL bi-encoder on NFCorpus.**
+   Instructor-XL alone scores NDCG@1 = 0.5077 / NDCG@10 = 0.4120, while the fine-tuned MiniLM-L-4 reranker scores NDCG@1 = 0.4427 / NDCG@10 = 0.3326. That comparison is size-mismatched — Instructor-XL is ~1.3 B parameters versus MiniLM-L-4's ~19 M (roughly 70× larger) — but it does mean **stacking this reranker on top of Instructor-XL's top-100 hurts top-1 quality on this corpus**. The apples-to-apples win is **fine-tuned vs base `ms-marco-MiniLM-L-4-v2`**, not vs the much larger first-stage retriever.
+
+2. **The wins are real but concentrated at the top of the list.**
+   Versus the base MS&nbsp;MARCO cross-encoder, fine-tuning delivers **+4.4 % NDCG@1, +4.2 % P@1, +3.9 % Recall@10**, while NDCG@10, MAP@10, and NDCG@100 are essentially flat. That is the *intended* behaviour of a top-K reranker — it reshuffles the head of the list, it does not enlarge the candidate pool — but if your use case rewards deep-list quality (e.g. evidence aggregation across 50+ documents), this fine-tune will not move the needle for you.
+
+3. **NFCorpus is unusually friendly to dense retrievers.**
+   NFCorpus uses **graded relevance judgements** (not binary), and a large, instruction-tuned bi-encoder like Instructor-XL already captures most of the available signal. Public corpora where cross-encoder rerankers tend to show larger gains over a strong bi-encoder baseline (TREC-COVID, SciFact with binary qrels, BioASQ) are not yet evaluated here — PRs welcome.
+
+4. **No in-house or clinical data is included.**
+   Everything in this repo is reproduced from the public BEIR release of NFCorpus. If you compare these numbers against a private medical corpus you have access to, expect the absolute deltas to shift — sometimes substantially in either direction.
 
 ---
 
